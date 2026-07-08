@@ -2,8 +2,9 @@
 Learning project on blockchain
 
 # Requirements 
-- mySql running server 
-- podman (or docker desktop, but setup will show with podman)
+- Podman + podman-compose
+- Go
+- golang-migrate CLI
 
 # Local Setup 
 Install brew:
@@ -65,6 +66,16 @@ CREATE TABLE match_players (
 );
 ```
 
+Setup migration: 
+`brew install golang-migrate`
+
+Run migration: 
+```
+migrate \
+-path migrations \
+-database "mysql://app:password@tcp(localhost:3306)/skirmish" \
+up
+```
 
 # Decisions
 

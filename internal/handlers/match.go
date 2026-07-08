@@ -32,13 +32,6 @@ type CreateMatchRequest struct {
 	PlayerIDs      []int64   `json:"player_ids"`
 }
 
-type UpdateMatchRequest struct {
-	WinnerPlayerID int64     `json:"winner_player_id"`
-	StartedAt      time.Time `json:"started_at"`
-	EndedAt        time.Time `json:"ended_at"`
-	PlayerIDs      []int64   `json:"player_ids"`
-}
-
 func (h *MatchHandler) CreateMatch(
 	w http.ResponseWriter,
 	r *http.Request,
