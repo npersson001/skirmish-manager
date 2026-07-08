@@ -8,17 +8,25 @@ import (
 	"github.com/npersson001/skirmish-manager/internal/models"
 )
 
-type PlayerRepository struct {
+type PlayerRepository interface {
+	Create(ctx context.Context, player *models.Player, ) error
+	Get(ctx context.Context, id int64) (*models.Player, error)
+	List(ctx context.Context, ) ([]models.Player, error)
+	Update(ctx context.Context, player *models.Player, ) error
+	Delete(ctx context.Context, id int64, ) error
+}
+
+type PlayerRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewPlayerRepository(db *sqlx.DB) *PlayerRepository {
-	return &PlayerRepository{
+func NewPlayerRepository(db *sqlx.DB) PlayerRepository {
+	return &PlayerRepositoryImpl{
 		db: db,
 	}
 }
 
-func (r *PlayerRepository) Create(
+func (r *PlayerRepositoryImpl) Create(
 	ctx context.Context,
 	player *models.Player,
 ) error {
@@ -51,7 +59,7 @@ func (r *PlayerRepository) Create(
 	return nil
 }
 
-func (r *PlayerRepository) List(
+func (r *PlayerRepositoryImpl) List(
 	ctx context.Context,
 ) ([]models.Player, error) {
 
@@ -76,7 +84,7 @@ func (r *PlayerRepository) List(
 	return players, nil
 }
 
-func (r *PlayerRepository) Get(
+func (r *PlayerRepositoryImpl) Get(
 	ctx context.Context,
 	id int64,
 ) (*models.Player, error) {
@@ -103,7 +111,7 @@ func (r *PlayerRepository) Get(
 	return &player, nil
 }
 
-func (r *PlayerRepository) Update(
+func (r *PlayerRepositoryImpl) Update(
 	ctx context.Context,
 	player *models.Player,
 ) error {
@@ -125,7 +133,7 @@ func (r *PlayerRepository) Update(
 	return err
 }
 
-func (r *PlayerRepository) Delete(
+func (r *PlayerRepositoryImpl) Delete(
 	ctx context.Context,
 	id int64,
 ) error {

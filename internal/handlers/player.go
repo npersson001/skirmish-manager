@@ -9,18 +9,18 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/npersson001/skirmish-manager/internal/models"
-	"github.com/npersson001/skirmish-manager/internal/repository"
+	"github.com/npersson001/skirmish-manager/internal/services"
 )
 
 type PlayerHandler struct {
-	repo *repository.PlayerRepository
+	service services.PlayerService
 }
 
 func NewPlayerHandler(
-	repo *repository.PlayerRepository,
+	service services.PlayerService,
 ) *PlayerHandler {
 	return &PlayerHandler{
-		repo: repo,
+		service: service,
 	}
 }
 
@@ -50,28 +50,19 @@ func (h *PlayerHandler) CreatePlayer(
 		return
 	}
 
-	if req.Username == "" {
-		http.Error(
-			w,
-			"username is required",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
 	player := models.Player{
 		Username:    req.Username,
 		Description: req.Description,
 	}
 
-	if err = h.repo.Create(
+	if err := h.service.CreatePlayer(
 		r.Context(),
 		&player,
 	); err != nil {
 		http.Error(
 			w,
 			err.Error(),
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 		)
 		return
 	}
@@ -99,7 +90,7 @@ func (h *PlayerHandler) ListPlayers(
 	var err error
 	var players []models.Player
 
-	if players, err = h.repo.List(
+	if players, err = h.service.ListPlayers(
 		r.Context(),
 	); err != nil {
 		fmt.Print(err.Error())
@@ -146,7 +137,7 @@ func (h *PlayerHandler) GetPlayer(
 			http.StatusBadRequest,
 		)
 		return
-	} else if player, err = h.repo.Get(
+	} else if player, err = h.service.GetPlayer(
 		r.Context(),
 		id,
 	); err != nil {
@@ -211,7 +202,7 @@ func (h *PlayerHandler) UpdatePlayer(
 		Description: req.Description,
 	}
 
-	if err = h.repo.Update(
+	if err = h.service.UpdatePlayer(
 		r.Context(),
 		player,
 	); err != nil {
@@ -253,7 +244,7 @@ func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest,
 		)
 		return
-	} else if err = h.repo.Delete(
+	} else if err = h.service.DeletePlayer(
 		r.Context(),
 		id,
 	); err != nil {

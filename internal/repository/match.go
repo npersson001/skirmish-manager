@@ -8,24 +8,31 @@ import (
 	"github.com/npersson001/skirmish-manager/internal/models"
 )
 
-type MatchRepository struct {
+type MatchRepository interface {
+	Create(ctx context.Context, match *models.Match, playerIDs []int64) error
+	List(ctx context.Context) ([]models.Match, error)
+	Get(ctx context.Context, id int64) (*models.Match, error)
+	Delete(ctx context.Context, id int64) error
+}
+
+type MatchRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func NewMatchRepository(db *sqlx.DB) *MatchRepository {
-	return &MatchRepository{
+func NewMatchRepository(db *sqlx.DB) MatchRepository {
+	return &MatchRepositoryImpl{
 		db: db,
 	}
 }
 
-func (r *MatchRepository) Create(
+func (r *MatchRepositoryImpl) Create(
 	ctx context.Context,
 	match *models.Match,
 	playerIDs []int64,
-) (*models.Match, error) {
+) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer tx.Rollback() // if txn fails because of conflict, rollback the changes
 
@@ -47,12 +54,12 @@ func (r *MatchRepository) Create(
 	)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	matchID, err := result.LastInsertId() // TODO does this ALWAYS get the most recent without issue inside txn
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	match.ID = matchID
@@ -73,18 +80,18 @@ func (r *MatchRepository) Create(
 		)
 
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return match, nil
+	return nil
 }
 
-func (r *MatchRepository) List(
+func (r *MatchRepositoryImpl) List(
 	ctx context.Context,
 ) ([]models.Match, error) {
 
@@ -112,7 +119,7 @@ func (r *MatchRepository) List(
 	return matches, nil
 }
 
-func (r *MatchRepository) Get(
+func (r *MatchRepositoryImpl) Get(
 	ctx context.Context,
 	id int64,
 ) (*models.Match, error) {
@@ -142,32 +149,7 @@ func (r *MatchRepository) Get(
 	return &match, nil
 }
 
-func (r *MatchRepository) Update(
-	ctx context.Context,
-	match *models.Match,
-	playerIDs []int64,
-) error {
-
-	_, err := r.db.ExecContext(
-		ctx,
-		`
-		UPDATE matches
-		SET
-			winner_player_id = ?,
-			started_at = ?,
-			ended_at = ?
-		WHERE id = ?
-		`,
-		match.WinnerPlayerID,
-		match.StartedAt,
-		match.EndedAt,
-		match.ID,
-	)
-
-	return err
-}
-
-func (r *MatchRepository) Delete(
+func (r *MatchRepositoryImpl) Delete(
 	ctx context.Context,
 	id int64,
 ) error {
@@ -183,8 +165,3 @@ func (r *MatchRepository) Delete(
 
 	return err
 }
-
-// TODO create table like this:
-//FOREIGN KEY (match_id)
-//REFERENCES matches(id)
-//ON DELETE CASCADE

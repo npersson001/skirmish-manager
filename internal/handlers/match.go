@@ -10,18 +10,18 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/npersson001/skirmish-manager/internal/models"
-	"github.com/npersson001/skirmish-manager/internal/repository"
+	"github.com/npersson001/skirmish-manager/internal/services"
 )
 
 type MatchHandler struct {
-	repo *repository.MatchRepository
+	service services.MatchService
 }
 
 func NewMatchHandler(
-	repo *repository.MatchRepository,
+	service services.MatchService,
 ) *MatchHandler {
 	return &MatchHandler{
-		repo: repo,
+		service: service,
 	}
 }
 
@@ -47,48 +47,13 @@ func (h *MatchHandler) CreateMatch(
 		return
 	}
 
-	if len(req.PlayerIDs) < 2 {
-		http.Error(
-			w,
-			"a match must contain at least two players",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	if req.EndedAt.Before(req.StartedAt) {
-		http.Error(
-			w,
-			"ended_at must be after started_at",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
-	foundWinner := false
-	for _, playerID := range req.PlayerIDs {
-		if playerID == req.WinnerPlayerID {
-			foundWinner = true
-			break
-		}
-	}
-
-	if !foundWinner {
-		http.Error(
-			w,
-			"winner_player_id must be one of the participating players",
-			http.StatusBadRequest,
-		)
-		return
-	}
-
 	match := models.Match{
 		WinnerPlayerID: req.WinnerPlayerID,
 		StartedAt:      req.StartedAt,
 		EndedAt:        req.EndedAt,
 	}
 
-	createdMatch, err := h.repo.Create(
+	err := h.service.CreateMatch(
 		r.Context(),
 		&match,
 		req.PlayerIDs,
@@ -97,8 +62,8 @@ func (h *MatchHandler) CreateMatch(
 	if err != nil {
 		http.Error(
 			w,
-			"failed to create match",
-			http.StatusInternalServerError,
+			err.Error(),
+			http.StatusInternalServerError, // TODO figure out how to get different http status errors for bad request (fails validation in service layer vs failure in repository layer / db issue
 		)
 		return
 	}
@@ -106,7 +71,7 @@ func (h *MatchHandler) CreateMatch(
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	if err := json.NewEncoder(w).Encode(createdMatch); err != nil {
+	if err := json.NewEncoder(w).Encode(match); err != nil {
 		http.Error(
 			w,
 			"failed to write response",
@@ -122,7 +87,7 @@ func (h *MatchHandler) ListMatches(
 	var err error
 	var matches []models.Match
 
-	if matches, err = h.repo.List(
+	if matches, err = h.service.ListMatches(
 		r.Context(),
 	); err != nil {
 		fmt.Print(err.Error())
@@ -169,7 +134,7 @@ func (h *MatchHandler) GetMatch(
 			http.StatusBadRequest,
 		)
 		return
-	} else if match, err = h.repo.Get(
+	} else if match, err = h.service.GetMatch(
 		r.Context(),
 		id,
 	); err != nil {
@@ -215,7 +180,7 @@ func (h *MatchHandler) DeleteMatch(
 			http.StatusBadRequest,
 		)
 		return
-	} else if err = h.repo.Delete(
+	} else if err = h.service.DeleteMatch(
 		r.Context(),
 		id,
 	); err != nil {
