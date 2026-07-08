@@ -41,9 +41,39 @@ CREATE TABLE players (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     description TEXT
 );
+
+CREATE TABLE matches (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    winner_player_id BIGINT NOT NULL,
+    started_at DATETIME NOT NULL,
+    ended_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (winner_player_id)
+        REFERENCES players(id)
+);
+
+CREATE TABLE match_players (
+    match_id BIGINT NOT NULL,
+    player_id BIGINT NOT NULL,
+    PRIMARY KEY(match_id, player_id),
+    INDEX idx_match_players_player_id(player_id),
+    FOREIGN KEY (match_id)
+        REFERENCES matches(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (player_id)
+        REFERENCES players(id)
+);
 ```
 
 
 # Decisions
 
-Chi used for middleware because it is lightweight and close to net/http. Encourages good organization. 
+## Technical 
+- Chi used for middleware because it is lightweight and close to net/http. Encourages good organization. 
+- sqlx used for DB access because it allows sql inline which gives us flexibility for more complex queries than ORMs allow
+
+## Business Logic 
+- Matches are not update-able, they are immutable
+- Deleting a player will not delete a match/match_player as those are historical records 
+- Deleting a match will delete a match_player though, but is not a common pattern we would want to support in reality
+- 

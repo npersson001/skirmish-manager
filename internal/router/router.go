@@ -6,7 +6,7 @@ import (
 	"github.com/npersson001/skirmish-manager/internal/handlers"
 )
 
-func New(ph *handlers.PlayerHandler) *chi.Mux {
+func New(ph *handlers.PlayerHandler, mh *handlers.MatchHandler) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Route("/players", func(r chi.Router) {
@@ -15,6 +15,13 @@ func New(ph *handlers.PlayerHandler) *chi.Mux {
 		r.Get("/{id}", ph.GetPlayer)
 		r.Put("/{id}", ph.UpdatePlayer)
 		r.Delete("/{id}", ph.DeletePlayer)
+	})
+
+	r.Route("/matches", func(r chi.Router) {
+		r.Post("/", mh.CreateMatch)
+		r.Get("/", mh.ListMatches)
+		r.Get("/{id}", mh.GetMatch)
+		r.Delete("/{id}", mh.DeleteMatch)
 	})
 
 	return r

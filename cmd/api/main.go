@@ -24,7 +24,13 @@ func main() {
 		playerRepo,
 	)
 
-	r := router.New(playerHandler)
+	matchRepo := repository.NewMatchRepository(db)
+
+	matchHandler := handlers.NewMatchHandler(
+		matchRepo,
+	)
+
+	r := router.New(playerHandler, matchHandler)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal(err)
