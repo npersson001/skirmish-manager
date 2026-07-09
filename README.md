@@ -21,8 +21,11 @@ podman machine start
 Install podman compose: 
 `brew install podman-compose`
 
-Start mySql DB via docker compose: 
-`podman-compose up -d`
+Start mySql DB and API via docker compose: 
+`podman-compose up -d --build`
+
+Teardown podman volume: 
+`podman-compose down -v`
 
 Setup DB: 
 ```
