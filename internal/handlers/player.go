@@ -34,6 +34,18 @@ type UpdatePlayerRequest struct {
 	Description string `json:"description"`
 }
 
+// CreatePlayer Creates a player
+//
+// @Summary Create a player
+// @Description Creates a new player.
+// @Tags players
+// @Accept json
+// @Produce json
+// @Param player body CreatePlayerRequest true "Player to create"
+// @Success 201 {object} models.Player
+// @Failure 400 {string} string
+// @Failure 500 {string} string
+// @Router /players [post]
 func (h *PlayerHandler) CreatePlayer(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -83,6 +95,15 @@ func (h *PlayerHandler) CreatePlayer(
 	}
 }
 
+// ListPlayers Lists all players
+//
+// @Summary List players
+// @Description Returns all players.
+// @Tags players
+// @Produce json
+// @Success 200 {array} models.Player
+// @Failure 500 {string} string
+// @Router /players [get]
 func (h *PlayerHandler) ListPlayers(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -117,6 +138,18 @@ func (h *PlayerHandler) ListPlayers(
 	}
 }
 
+// GetPlayer Gets a player
+//
+// @Summary Get a player
+// @Description Returns a player by ID.
+// @Tags players
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 200 {object} models.Player
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /players/{id} [get]
 func (h *PlayerHandler) GetPlayer(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -163,6 +196,20 @@ func (h *PlayerHandler) GetPlayer(
 	}
 }
 
+// UpdatePlayer Updates a player
+//
+// @Summary Update a player
+// @Description Updates an existing player.
+// @Tags players
+// @Accept json
+// @Produce json
+// @Param id path int true "Player ID"
+// @Param player body UpdatePlayerRequest true "Updated player"
+// @Success 200 {object} models.Player
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /players/{id} [put]
 func (h *PlayerHandler) UpdatePlayer(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -228,6 +275,17 @@ func (h *PlayerHandler) UpdatePlayer(
 	}
 }
 
+// DeletePlayer Deletes a player
+//
+// @Summary Delete a player
+// @Description Deletes a player by ID.
+// @Tags players
+// @Produce json
+// @Param id path int true "Player ID"
+// @Success 204
+// @Failure 400 {string} string
+// @Failure 500 {string} string
+// @Router /players/{id} [delete]
 func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
 	idString := chi.URLParam(r, "id")
 	var id int64

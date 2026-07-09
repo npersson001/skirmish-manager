@@ -77,6 +77,15 @@ migrate \
 up
 ```
 
+Generate Swag Documentation: 
+```
+swag init -g cmd/api/main.go
+```
+Start the server and then navigate to: 
+```
+http://localhost:8080/swagger/index.html
+```
+
 # Decisions
 
 ## Technical 
@@ -85,15 +94,15 @@ up
 
 ## Business Logic 
 - Matches are not update-able, they are immutable
-- Deleting a player will not delete a match/match_player as those are historical records 
+- Deleting a player will not delete a match/match_player as those are historical records, player cannot be deleted
 - Deleting a match will delete a match_player though, but is not a common pattern we would want to support in reality
 
 # To Implement
-- Add Swagger
 - Add tests
 - Add config/env handling
 - Add Dockerfile for API
 - Figure out how blockchain works and add it + achievement table / api
+- Fix errors from functions and swagger annotation for those errors
 
 # Improvements
 There are some things I know I should do but do not have time for / are not high enough value to focus on right now: 

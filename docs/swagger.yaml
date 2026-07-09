@@ -1,0 +1,309 @@
+basePath: /
+definitions:
+  handlers.CreateMatchRequest:
+    properties:
+      ended_at:
+        type: string
+      player_ids:
+        items:
+          type: integer
+        type: array
+      started_at:
+        type: string
+      winner_player_id:
+        type: integer
+    type: object
+  handlers.CreatePlayerRequest:
+    properties:
+      description:
+        type: string
+      username:
+        type: string
+    type: object
+  handlers.UpdatePlayerRequest:
+    properties:
+      description:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Match:
+    properties:
+      created_at:
+        type: string
+      ended_at:
+        type: string
+      id:
+        type: integer
+      started_at:
+        type: string
+      winner_player_id:
+        type: integer
+    type: object
+  models.Player:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for tracking skirmish matches and player accomplishments.
+  title: Skirmish Manager API
+  version: "1.0"
+paths:
+  /matches:
+    get:
+      description: Returns all recorded matches.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Match'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List matches
+      tags:
+      - matches
+    post:
+      consumes:
+      - application/json
+      description: Creates a new match and records all participating players.
+      parameters:
+      - description: Match to create
+        in: body
+        name: match
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMatchRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Match'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a match
+      tags:
+      - matches
+  /matches/{id}:
+    delete:
+      description: Deletes a match by ID. Intended primarily for administrative use.
+      parameters:
+      - description: Match ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete a match
+      tags:
+      - matches
+    get:
+      description: Returns a match by its ID.
+      parameters:
+      - description: Match ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Match'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a match
+      tags:
+      - matches
+  /players:
+    get:
+      description: Returns all players.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Player'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List players
+      tags:
+      - players
+    post:
+      consumes:
+      - application/json
+      description: Creates a new player.
+      parameters:
+      - description: Player to create
+        in: body
+        name: player
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreatePlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Player'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a player
+      tags:
+      - players
+  /players/{id}:
+    delete:
+      description: Deletes a player by ID.
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete a player
+      tags:
+      - players
+    get:
+      description: Returns a player by ID.
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Player'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a player
+      tags:
+      - players
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing player.
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated player
+        in: body
+        name: player
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdatePlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Player'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update a player
+      tags:
+      - players
+swagger: "2.0"

@@ -2,6 +2,9 @@ package router
 
 import (
 	"github.com/go-chi/chi/v5"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "github.com/npersson001/skirmish-manager/docs"
 
 	"github.com/npersson001/skirmish-manager/internal/handlers"
 )
@@ -23,6 +26,8 @@ func New(ph *handlers.PlayerHandler, mh *handlers.MatchHandler) *chi.Mux {
 		r.Get("/{id}", mh.GetMatch)
 		r.Delete("/{id}", mh.DeleteMatch)
 	})
+
+	r.Mount("/swagger", httpSwagger.WrapHandler)
 
 	return r
 }

@@ -32,6 +32,18 @@ type CreateMatchRequest struct {
 	PlayerIDs      []int64   `json:"player_ids"`
 }
 
+// CreateMatch Creates a new match.
+//
+// @Summary Create a match
+// @Description Creates a new match and records all participating players.
+// @Tags matches
+// @Accept json
+// @Produce json
+// @Param match body CreateMatchRequest true "Match to create"
+// @Success 201 {object} models.Match
+// @Failure 400 {string} string
+// @Failure 500 {string} string
+// @Router /matches [post]
 func (h *MatchHandler) CreateMatch(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -80,6 +92,15 @@ func (h *MatchHandler) CreateMatch(
 	}
 }
 
+// ListMatches Lists all matches.
+//
+// @Summary List matches
+// @Description Returns all recorded matches.
+// @Tags matches
+// @Produce json
+// @Success 200 {array} models.Match
+// @Failure 500 {string} string
+// @Router /matches [get]
 func (h *MatchHandler) ListMatches(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -114,6 +135,18 @@ func (h *MatchHandler) ListMatches(
 	}
 }
 
+// GetMatch Gets a match by ID.
+//
+// @Summary Get a match
+// @Description Returns a match by its ID.
+// @Tags matches
+// @Produce json
+// @Param id path int true "Match ID"
+// @Success 200 {object} models.Match
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /matches/{id} [get]
 func (h *MatchHandler) GetMatch(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -161,6 +194,19 @@ func (h *MatchHandler) GetMatch(
 }
 
 // TODO make delete an admin operation, treat matches as immutable historical events
+
+// DeleteMatch deletes a match.
+//
+// @Summary Delete a match
+// @Description Deletes a match by ID. Intended primarily for administrative use.
+// @Tags matches
+// @Produce json
+// @Param id path int true "Match ID"
+// @Success 204
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /matches/{id} [delete]
 func (h *MatchHandler) DeleteMatch(
 	w http.ResponseWriter,
 	r *http.Request,

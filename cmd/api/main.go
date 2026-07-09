@@ -10,6 +10,11 @@ import (
 	"github.com/npersson001/skirmish-manager/internal/services"
 )
 
+// @title Skirmish Manager API
+// @version 1.0
+// @description API for tracking skirmish matches and player accomplishments.
+// @host localhost:8080
+// @BasePath /
 func main() {
 	db, err := repository.NewMySQLConnection()
 
